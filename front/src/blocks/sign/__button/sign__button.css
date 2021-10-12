@@ -1,0 +1,22 @@
+.sign__button {
+  width: 100%;
+  margin-top: 216px;
+  margin-bottom: 15px;
+  padding: 14px 84px;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  border-radius: 2px;
+  background-color: #fff;
+  color: #000;
+  transition: opacity .5s ease;
+}
+
+.sign__button:hover {
+  opacity: .85;
+}
