@@ -3,4 +3,6 @@
 
 IP-адрес: 130.193.39.116
 
+Ссылка на API: https://api.timtorshin.nomoredomains.club
+
 Ссылка на сайт: https://timtorshin.nomoredomains.club
