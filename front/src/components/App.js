@@ -31,24 +31,29 @@ function App() {
   const history = useHistory();
 
   React.useEffect(() => {
-    api.getUserData()
-      .then((data) => {
-        setCurrentUser(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    if (isLoggedIn) {
+      api.getUserData(localStorage.jwt)
+        .then((data) => {
+          setCurrentUser(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [isLoggedIn]);
 
   React.useEffect(() => {
-    api.getInitialCards()
-      .then((cards) => {
-        setCards(cards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    if (isLoggedIn) {
+      api.getInitialCards(localStorage.jwt)
+        .then((cards) => {
+          console.log(cards);
+          setCards(cards.reverse());
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [isLoggedIn]);
 
   React.useEffect(() => {
     function handleEscape(evt) {
@@ -98,10 +103,10 @@ function App() {
     setSelectedCard({ name: '', link: '' });
   }
 
-  function handleUpdateUser({ name, about }) {
-    api.editProfileInfo(name, about)
-      .then((data) => {
-        setCurrentUser(data);
+  function handleUpdateUser(data) {
+    api.editProfileInfo(data, localStorage.jwt)
+      .then((res) => {
+        setCurrentUser({name: res.name, about: res.about, avatar: res.avatar});
         closeAllPopups();
       })
       .catch((err) => {
@@ -109,10 +114,10 @@ function App() {
       });
   }
 
-  function handleUpdateAvatar({ avatar }) {
-    api.updateAvatar(avatar)
+  function handleUpdateAvatar(link) {
+    api.updateAvatar(link, localStorage.jwt)
       .then((data) => {
-        setCurrentUser(data);
+        setCurrentUser({name: data.name, about: data.about, avatar: data.avatar});
         closeAllPopups();
       })
       .catch((err) => {
@@ -120,18 +125,18 @@ function App() {
       });
   }
 
-  function handleAddPlaceSubmit(card) {
-    api.addNewCard(card.name, card.link)
-      .then((newCard) => {
-        setCards([newCard, ...cards]);
+  function handleAddPlaceSubmit(data) {
+    api.addNewCard(data, localStorage.jwt)
+      .then((res) => {
+        setCards([res, ...cards]);
         closeAllPopups();
       })
   }
 
   function handleCardDelete(card) {
-    api.removeCard(card._id)
+    api.removeCard(card._id, localStorage.jwt)
       .then(() => {
-      setCards(cards.filter((c) => c._id !== card._id));
+        setCards(cards.filter((c) => c._id !== card._id));
       })
       .catch((err) => {
         console.log(err);
@@ -139,14 +144,11 @@ function App() {
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-    const changeLikeCardStatus = isLiked ? api.deleteLike(card._id) : api.putLike(card._id);
-    changeLikeCardStatus.then((newCard) => {
-      setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    const isLiked = card.likes.some((i) => i === currentUser._id);
+    api.changeLikeCardStatus(card._id, !isLiked, localStorage.jwt)
+      .then((newCard) => {
+        setCards((state) => state.map((c) => (c._id === card._id ? newCard : c)));
+      });
   }
 
   React.useEffect(() => {
@@ -157,7 +159,7 @@ function App() {
           if (res) {
             setIsLoggedIn(true);
             history.push('/');
-            setEmailValue(res.data.email);
+            setEmailValue(res.email);
           }
         })
         .catch((err) => {
@@ -165,7 +167,7 @@ function App() {
           localStorage.removeItem('jwt');
         });
     }
-  }, [isLoggedIn, history]);
+  }, [history]);
 
   function registration(email, password) {
     auth.register(email, password)

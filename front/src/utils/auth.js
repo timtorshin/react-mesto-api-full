@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://auth.nomoreparties.co';
+export const BASE_URL = 'https://api.timtorshin.nomoredomains.club';
 
 function checkResponse(res) {
   if (res.ok) {
@@ -11,6 +11,7 @@ export const register = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {
     method: 'POST',
     headers: {
+      'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({email, password})
@@ -22,6 +23,7 @@ export const authorize = (email, password) => {
   return fetch(`${BASE_URL}/signin`, {
     method: 'POST',
     headers: {
+      'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({email, password})
@@ -43,6 +45,5 @@ export const getContent = (token) => {
       "Authorization" : `Bearer ${token}`
     }
   })
-  .then(res => checkResponse(res))
-  .then(data => data);
+  .then(res => checkResponse(res));
 }
